@@ -8,12 +8,21 @@
 <meta name="viewport"
 content="width=device-width,
 initial-scale=1.0,
-maximum-scale=1.0">
+maximum-scale=1.0,
+user-scalable=no">
 
 
 <title>
 小赵私厨点菜
 </title>
+
+
+<!-- Supabase SDK -->
+
+<script src="
+https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2
+"></script>
+
 
 
 <style>
@@ -24,6 +33,7 @@ box-sizing:border-box;
 }
 
 
+
 body{
 
 margin:0;
@@ -32,35 +42,62 @@ background:#f7f5f0;
 
 font-family:
 "Microsoft YaHei",
-Arial;
+sans-serif;
 
-padding-bottom:90px;
+color:#333;
 
 }
 
 
-
-/*顶部*/
 
 .header{
 
-background:#8b0000;
+background:white;
 
-color:white;
-
-padding:18px;
+padding:20px;
 
 text-align:center;
 
-font-size:22px;
+position:sticky;
 
-font-weight:bold;
+top:0;
+
+z-index:10;
+
+box-shadow:
+0 2px 10px rgba(0,0,0,.08);
 
 }
 
 
 
-/*分类*/
+.header h1{
+
+margin:0;
+
+font-size:26px;
+
+letter-spacing:3px;
+
+}
+
+
+
+.header p{
+
+margin:8px 0 0;
+
+color:#888;
+
+font-size:14px;
+
+}
+
+
+
+
+/* 分类按钮 */
+
 
 .category{
 
@@ -70,21 +107,16 @@ overflow-x:auto;
 
 background:white;
 
-padding:12px;
+padding:10px;
 
 gap:10px;
-
-position:sticky;
-
-top:0;
-
-z-index:10;
 
 }
 
 
 
 .category button{
+
 
 border:none;
 
@@ -94,23 +126,27 @@ padding:8px 18px;
 
 border-radius:20px;
 
-white-space:nowrap;
+font-size:14px;
 
 }
 
 
 
-.category .active{
+.category button.active{
 
-background:#8b0000;
+
+background:#333;
 
 color:white;
 
+
 }
 
 
 
-/*菜品*/
+
+/* 菜品列表 */
+
 
 .menu{
 
@@ -120,7 +156,8 @@ padding:15px;
 
 
 
-.food{
+.food-card{
+
 
 background:white;
 
@@ -131,25 +168,31 @@ margin-bottom:18px;
 overflow:hidden;
 
 box-shadow:
-0 3px 10px rgba(0,0,0,.1);
+
+0 4px 15px rgba(0,0,0,.08);
+
 
 }
 
 
 
-.food img{
+.food-card img{
+
 
 width:100%;
 
-height:210px;
+height:180px;
 
 object-fit:cover;
+
 
 }
 
 
 
-.info{
+
+.food-info{
+
 
 padding:15px;
 
@@ -157,67 +200,80 @@ padding:15px;
 
 
 
-.name{
+.food-name{
+
 
 font-size:20px;
 
 font-weight:bold;
 
+
 }
 
 
 
-.type{
+.food-type{
+
 
 color:#888;
 
-margin:8px 0;
+font-size:14px;
+
+margin-top:8px;
+
 
 }
 
 
 
-textarea{
+
+.remark{
+
 
 width:100%;
 
-height:55px;
-
-border-radius:10px;
-
-border:1px solid #ddd;
+margin-top:12px;
 
 padding:10px;
 
+border-radius:8px;
+
+border:1px solid #ddd;
+
+font-size:14px;
+
 }
 
 
 
-.add{
+.add-btn{
+
 
 width:100%;
 
-margin-top:10px;
-
-background:#d2691e;
-
-color:white;
-
-border:none;
+margin-top:12px;
 
 padding:12px;
 
-border-radius:25px;
+border:none;
+
+border-radius:10px;
+
+background:#222;
+
+color:white;
 
 font-size:16px;
+
 
 }
 
 
 
-/*订单*/
+/* 底部购物栏 */
 
-.cart{
+
+.cart-bar{
 
 
 position:fixed;
@@ -232,28 +288,42 @@ right:0;
 background:white;
 
 
-padding:15px;
-
-
-box-shadow:
-0 -3px 10px rgba(0,0,0,.15);
+padding:12px 15px;
 
 
 display:flex;
 
+
 justify-content:space-between;
 
+
 align-items:center;
+
+
+box-shadow:
+
+0 -3px 15px rgba(0,0,0,.1);
 
 
 }
 
 
 
-.cart button{
+.cart-count{
 
 
-background:#8b0000;
+font-size:16px;
+
+font-weight:bold;
+
+}
+
+
+
+.cart-btn{
+
+
+background:#222;
 
 color:white;
 
@@ -268,8 +338,7 @@ border-radius:25px;
 
 
 
-
-/*弹窗*/
+/* 弹窗 */
 
 
 .modal{
@@ -281,52 +350,134 @@ display:none;
 position:fixed;
 
 
-top:0;
-
 left:0;
 
 right:0;
 
+top:0;
+
 bottom:0;
 
 
-background:white;
+background:
+
+rgba(0,0,0,.45);
 
 
 z-index:100;
 
 
-padding:20px;
+}
 
+
+
+.modal-box{
+
+
+background:white;
+
+width:90%;
+
+max-height:80%;
 
 overflow:auto;
 
+margin:80px auto;
+
+
+border-radius:20px;
+
+
+padding:20px;
+
 
 }
 
 
 
-.item{
+.modal-title{
 
-border-bottom:
-1px solid #ddd;
 
-padding:15px 0;
+font-size:22px;
+
+font-weight:bold;
+
+margin-bottom:15px;
+
 
 }
 
 
-.delete{
 
-background:#aaa;
+.order-item{
+
+
+border-bottom:1px solid #eee;
+
+padding:12px 0;
+
+
+}
+
+
+
+.name-input{
+
+
+width:100%;
+
+padding:12px;
+
+border-radius:10px;
+
+border:1px solid #ddd;
+
+margin-bottom:15px;
+
+font-size:16px;
+
+
+}
+
+
+
+.submit-btn{
+
+
+width:100%;
+
+background:#d35400;
 
 color:white;
 
 border:none;
 
-padding:5px 15px;
+padding:14px;
 
-border-radius:15px;
+border-radius:12px;
+
+font-size:17px;
+
+
+}
+
+
+
+.close-btn{
+
+
+width:100%;
+
+margin-top:10px;
+
+padding:12px;
+
+border:none;
+
+background:#eee;
+
+border-radius:12px;
+
 
 }
 
@@ -336,51 +487,67 @@ border-radius:15px;
 </head>
 
 
-
 <body>
 
 
 
 <div class="header">
 
-🍲 小赵私厨菜单
+
+<h1>
+东北私厨
+</h1>
+
+
+<p>
+家常味道 · 手机点菜
+</p>
+
 
 </div>
-
 
 
 
 <div class="category">
 
 
-<button onclick="changeType('全部')">
+<button class="active"
+onclick="changeCategory('全部')">
+
 全部
+
 </button>
 
 
-<button onclick="changeType('素菜')">
-🥬素菜
+<button onclick="changeCategory('素菜')">
+
+素菜
+
 </button>
 
 
-<button onclick="changeType('荤菜')">
-🍖荤菜
+<button onclick="changeCategory('荤菜')">
+
+荤菜
+
 </button>
 
 
-<button onclick="changeType('凉菜')">
-🥗凉菜
+<button onclick="changeCategory('凉菜')">
+
+凉菜
+
 </button>
 
 
-<button onclick="changeType('汤')">
-🍲汤
+<button onclick="changeCategory('汤')">
+
+汤
+
 </button>
 
 
 </div>
-
-
 
 
 
@@ -391,59 +558,75 @@ class="menu">
 
 
 
+<div class="cart-bar">
 
 
-<div class="cart">
+<div class="cart-count">
 
-
-<div>
-
-🛒 已选：
-
-<span id="count">
+已选：
+<span id="cartCount">
 0
 </span>
-
 道菜
 
 </div>
 
 
-
-<button onclick="openCart()">
+<button class="cart-btn"
+onclick="openCart()">
 
 查看菜单
 
 </button>
 
 
-
 </div>
 
 
 
-
-
-<div id="modal"
+<div id="cartModal"
 class="modal">
 
 
-<h2>
-
-我的点菜单
-
-</h2>
+<div class="modal-box">
 
 
+<div class="modal-title">
 
-<div id="order">
+确认订单
 
 </div>
 
 
-<button onclick="closeCart()">
 
-返回
+<input
+id="username"
+class="name-input"
+placeholder="请输入您的姓名">
+
+
+
+<div id="orderList">
+
+</div>
+
+
+
+<button
+class="submit-btn"
+onclick="submitOrder()">
+
+提交订单
+
+</button>
+
+
+
+<button
+class="close-btn"
+onclick="closeCart()">
+
+关闭
 
 </button>
 
@@ -451,15 +634,47 @@ class="modal">
 </div>
 
 
-
+</div>
 
 
 
 <script>
 
 
-let foods=[
+// ================================
+// Supabase 配置
+// ================================
 
+
+const SUPABASE_URL =
+
+"https://ovrhpmcvxfvhkqzlfjgd.supabase.co";
+
+
+
+const SUPABASE_KEY =
+
+"sb_publishable_-D9hxijmh3gvmfOAUS47Bw_77j_9Y2Q";
+
+
+
+const supabaseClient =
+
+supabase.createClient(
+
+SUPABASE_URL,
+
+SUPABASE_KEY
+
+);
+
+
+// ================================
+// 菜品数据库
+// ================================
+
+
+const foods = [
 
 
 {
@@ -564,7 +779,6 @@ image:"images/东北杀猪菜.png"
 
 
 
-
 {
 name:"拍黄瓜",
 type:"凉菜",
@@ -622,52 +836,80 @@ image:"images/白菜豆腐汤.png"
 
 
 
+// ================================
+// 当前分类
+// ================================
+
+
+let currentCategory="全部";
+
+
+
+// ================================
+// 已选订单
+// ================================
+
+
 let order=[];
 
 
-let current="全部";
 
 
 
-function render(){
+// ================================
+// 渲染菜品
+// ================================
+
+
+function renderMenu(){
 
 
 let html="";
 
 
-foods.forEach((f,i)=>{
+
+foods.forEach((food,index)=>{
 
 
 if(
-current!="全部"
+
+currentCategory!="全部"
+
 &&
-f.type!=current
-)
+
+food.type!=currentCategory
+
+){
+
 return;
+
+}
 
 
 
 html+=`
 
-<div class="food">
+<div class="food-card">
 
 
-<img src="${f.image}">
+<img src="${food.image}">
 
 
-<div class="info">
+
+<div class="food-info">
 
 
-<div class="name">
+<div class="food-name">
 
-${f.name}
+${food.name}
 
 </div>
 
 
-<div class="type">
 
-${f.type}
+<div class="food-type">
+
+${food.type}
 
 </div>
 
@@ -675,7 +917,9 @@ ${f.type}
 
 <textarea
 
-id="remark${i}"
+class="remark"
+
+id="remark-${index}"
 
 placeholder="备注：少辣、不放葱、加辣">
 
@@ -683,13 +927,17 @@ placeholder="备注：少辣、不放葱、加辣">
 
 
 
-<button class="add"
 
-onclick="add(${i})">
+<button
+
+class="add-btn"
+
+onclick="addFood(${index})">
 
 加入菜单
 
 </button>
+
 
 
 </div>
@@ -704,7 +952,10 @@ onclick="add(${i})">
 });
 
 
-document.getElementById("menu").innerHTML=html;
+
+document.getElementById("menu")
+
+.innerHTML=html;
 
 
 }
@@ -713,52 +964,78 @@ document.getElementById("menu").innerHTML=html;
 
 
 
-function changeType(t){
+// ================================
+// 分类切换
+// ================================
 
-current=t;
 
-render();
+function changeCategory(type){
+
+
+currentCategory=type;
+
+
+renderMenu();
+
 
 }
 
 
 
 
+// ================================
+// 加入购物车
+// ================================
 
-function add(i){
+
+function addFood(index){
 
 
 let remark=
+
 document.getElementById(
-"remark"+i
+
+"remark-"+index
+
 ).value;
 
 
 
 order.push({
 
-name:foods[i].name,
+name:foods[index].name,
 
 remark:remark
+
 
 });
 
 
-document.getElementById("count").innerHTML=
+
+document.getElementById(
+
+"cartCount"
+
+).innerHTML=
+
 order.length;
 
 
+
 alert(
-foods[i].name+" 已加入"
+
+foods[index].name+" 已加入菜单"
+
 );
+
 
 
 }
 
 
-
-
-
+// ================================
+// 打开购物车
+// ================================
 
 
 function openCart(){
@@ -767,26 +1044,46 @@ function openCart(){
 let html="";
 
 
-order.forEach((x,i)=>{
+
+if(order.length==0){
+
+
+html="暂无选择菜品";
+
+
+}
+
+else{
+
+
+order.forEach((item,index)=>{
 
 
 html+=`
 
-<div class="item">
+<div class="order-item">
+
 
 <h3>
-${x.name}
+
+${item.name}
+
 </h3>
 
 
 <p>
+
 备注：
-${x.remark||"无"}
+
+${item.remark || "无"}
+
 </p>
 
 
-<button class="delete"
-onclick="del(${i})">
+
+<button
+
+onclick="deleteFood(${index})">
 
 删除
 
@@ -799,60 +1096,333 @@ onclick="del(${i})">
 `;
 
 
+
 });
-
-
-
-if(html=="")
-html="暂无菜品";
-
-
-
-document.getElementById("order")
-.innerHTML=html;
-
-
-
-document.getElementById("modal")
-.style.display="block";
 
 
 }
 
+
+
+document.getElementById(
+
+"orderList"
+
+).innerHTML=html;
+
+
+
+document.getElementById(
+
+"cartModal"
+
+).style.display="block";
+
+
+
+}
+
+
+
+
+
+// ================================
+// 关闭购物车
+// ================================
 
 
 function closeCart(){
 
-document.getElementById("modal")
-.style.display="none";
+
+document.getElementById(
+
+"cartModal"
+
+).style.display="none";
+
 
 }
 
 
 
-function del(i){
 
 
-order.splice(i,1);
+
+// ================================
+// 删除菜品
+// ================================
 
 
-document.getElementById("count")
-.innerHTML=order.length;
+function deleteFood(index){
+
+
+order.splice(index,1);
+
+
+
+document.getElementById(
+
+"cartCount"
+
+).innerHTML=
+
+order.length;
+
 
 
 openCart();
 
 
+
 }
 
 
 
-render();
+
+
+
+// ================================
+// 提交订单到 Supabase
+// ================================
+
+
+async function submitOrder(){
+
+
+
+// 判断是否有菜
+
+
+if(order.length===0){
+
+
+alert(
+
+"请先选择菜品"
+
+);
+
+
+return;
+
+
+}
+
+
+
+
+
+// 获取姓名
+
+
+let username=
+
+document.getElementById(
+
+"username"
+
+).value.trim();
+
+
+
+
+
+if(username===""){
+
+
+alert(
+
+"请输入您的姓名"
+
+);
+
+
+return;
+
+
+}
+
+
+
+
+
+// 菜品字符串
+
+
+let foodsText=
+
+order
+
+.map(
+
+item=>item.name
+
+)
+
+.join(",");
+
+
+
+
+
+
+// 备注字符串
+
+
+let remarkText=
+
+order
+
+.map(
+
+item=>
+
+
+item.name+
+
+"："+
+
+(item.remark || "无")
+
+)
+
+.join("\n");
+
+
+
+
+
+
+// 写入数据库
+
+
+const {
+
+data,
+
+error
+
+}=
+
+await supabaseClient
+
+.from("orders")
+
+.insert([
+
+
+{
+
+
+username:username,
+
+
+foods:foodsText,
+
+
+remark:remarkText
+
+
+}
+
+
+]);
+
+
+
+
+
+
+
+if(error){
+
+
+
+console.log(error);
+
+
+
+alert(
+
+"提交失败："
+
++
+
+error.message
+
+);
+
+
+
+return;
+
+
+}
+
+
+
+
+
+alert(
+
+"菜单提交成功！"
+
++
+
+"\n小赵厨师已经收到您的点餐"
+
+);
+
+
+
+
+
+
+// 清空
+
+
+order=[];
+
+
+
+document.getElementById(
+
+"cartCount"
+
+).innerHTML="0";
+
+
+
+document.getElementById(
+
+"username"
+
+).value="";
+
+
+
+closeCart();
+
+
+
+
+}
+
+
+
+
+// ================================
+// 页面启动
+// ================================
+
+
+renderMenu();
 
 
 </script>
 
 
 </body>
+
 
 </html>
